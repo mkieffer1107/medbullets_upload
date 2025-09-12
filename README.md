@@ -17,10 +17,5 @@ And enter the configs you like:
 chmod +x run.sh
 ./run.sh --username <username> \
          --repo Medbullets \
-         --private true
+         --private false
 ```
-
-
-./run.sh --username mkieffer \
-         --repo Medbullets \
-         --private true
