@@ -19,3 +19,5 @@ chmod +x run.sh
          --repo Medbullets \
          --private false
 ```
+
+voila! https://huggingface.co/datasets/mkieffer/Medbullets
