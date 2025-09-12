@@ -20,4 +20,6 @@ chmod +x run.sh
          --private false
 ```
 
-voila! https://huggingface.co/datasets/mkieffer/Medbullets
+Voila! The dataset now lives [on HuggingFace](https://huggingface.co/datasets/mkieffer/Medbullets).
+
+All credit belongs to the [original authors](https://github.com/HanjieChen/ChallengeClinicalQA)
