@@ -8,20 +8,28 @@ def _strip_E(split):
         yield ex
 
 if __name__ == "__main__":
-    dataset = load_dataset("mkieffer/Medbullets")
+    # load all data
+    # dataset = load_dataset("mkieffer/Medbullets")
 
-    # rebuild just the op4 splits to remove the "E" option
-    op4_train_noE = Dataset.from_generator(lambda: _strip_E(dataset["op4_train"]))
-    op4_eval_noE  = Dataset.from_generator(lambda: _strip_E(dataset["op4_eval"]))
+    # load only op4 splits
+    op4_train, op4_eval = load_dataset("mkieffer/Medbullets", split=["op4_train", "op4_eval"])
 
+    # remove the "E" option from op4 splits
+    op4_train = Dataset.from_generator(lambda: _strip_E(op4_train))
+    op4_eval  = Dataset.from_generator(lambda: _strip_E(op4_eval))
+
+    # load only op5 splits
+    op5_train, op5_eval = load_dataset("mkieffer/Medbullets", split=["op5_train", "op5_eval"])
+
+    # optionally, combine them into a single dataset
     dataset = DatasetDict({
-        "op4_train": op4_train_noE,
-        "op4_eval":  op4_eval_noE,
-        "op5_train": dataset["op5_train"],
-        "op5_eval":  dataset["op5_eval"],
+        "op4_train": op4_train,
+        "op4_eval":  op4_eval,
+        "op5_train": op5_train,
+        "op5_eval":  op5_eval,
     })
 
-    print(json.dumps(dataset["op4_train"][0], indent=2))
-    print(json.dumps(dataset["op4_eval"][0], indent=2))
-    print(json.dumps(dataset["op5_train"][0], indent=2))
-    print(json.dumps(dataset["op5_eval"][0], indent=2))
+    print("\nop4_train:\n", json.dumps(dataset["op4_train"][0], indent=2))
+    print("\nop4_eval:\n", json.dumps(dataset["op4_eval"][0], indent=2))
+    print("\nop5_train:\n", json.dumps(dataset["op5_train"][0], indent=2))
+    print("\nop5_eval:\n", json.dumps(dataset["op5_eval"][0], indent=2))
