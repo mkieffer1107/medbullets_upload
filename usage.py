@@ -21,15 +21,7 @@ if __name__ == "__main__":
     # load only op5 splits
     op5_train, op5_eval = load_dataset("mkieffer/Medbullets", split=["op5_train", "op5_eval"])
 
-    # optionally, combine them into a single dataset
-    dataset = DatasetDict({
-        "op4_train": op4_train,
-        "op4_eval":  op4_eval,
-        "op5_train": op5_train,
-        "op5_eval":  op5_eval,
-    })
-
-    print("\nop4_train:\n", json.dumps(dataset["op4_train"][0], indent=2))
-    print("\nop4_eval:\n", json.dumps(dataset["op4_eval"][0], indent=2))
-    print("\nop5_train:\n", json.dumps(dataset["op5_train"][0], indent=2))
-    print("\nop5_eval:\n", json.dumps(dataset["op5_eval"][0], indent=2))
+    print("\nop4_train:\n", json.dumps(op4_train[0], indent=2))
+    print("\nop4_eval:\n", json.dumps(op4_eval[0], indent=2))
+    print("\nop5_train:\n", json.dumps(op5_train[0], indent=2))
+    print("\nop5_eval:\n", json.dumps(op5_eval[0], indent=2))
