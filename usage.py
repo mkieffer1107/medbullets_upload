@@ -1,5 +1,5 @@
 import json
-from datasets import load_dataset, Dataset, DatasetDict
+from datasets import load_dataset, Dataset
 
 def _strip_E(split):
     for ex in split:

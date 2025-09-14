@@ -85,7 +85,7 @@ The train/eval splits for a given number of options are 80/20, where the last 20
 
 ```python
 import json
-from datasets import load_dataset, Dataset, DatasetDict
+from datasets import load_dataset, Dataset
 
 def _strip_E(split):
     for ex in split:
