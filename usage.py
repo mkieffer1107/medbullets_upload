@@ -8,20 +8,10 @@ def _strip_E(split):
         yield ex
 
 if __name__ == "__main__":
-    # load all data
-    # dataset = load_dataset("mkieffer/Medbullets")
+    op4_test, op5_test = load_dataset("mkieffer/Medbullets", split=["op4_test", "op5_test"])
 
-    # load only op4 splits
-    op4_train, op4_eval = load_dataset("mkieffer/Medbullets", split=["op4_train", "op4_eval"])
+    # remove the "E" option from op4 split
+    op4_test = Dataset.from_generator(lambda: _strip_E(op4_test))
 
-    # remove the "E" option from op4 splits
-    op4_train = Dataset.from_generator(lambda: _strip_E(op4_train))
-    op4_eval  = Dataset.from_generator(lambda: _strip_E(op4_eval))
-
-    # load only op5 splits
-    op5_train, op5_eval = load_dataset("mkieffer/Medbullets", split=["op5_train", "op5_eval"])
-
-    print("\nop4_train:\n", json.dumps(op4_train[0], indent=2))
-    print("\nop4_eval:\n", json.dumps(op4_eval[0], indent=2))
-    print("\nop5_train:\n", json.dumps(op5_train[0], indent=2))
-    print("\nop5_eval:\n", json.dumps(op5_eval[0], indent=2))
+    print("\nop4_test:\n", json.dumps(op4_test[0], indent=2))
+    print("\nop5_test:\n", json.dumps(op5_test[0], indent=2))

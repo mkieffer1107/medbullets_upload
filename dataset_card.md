@@ -24,31 +24,21 @@ dataset_info:
   - name: link
     dtype: string
   splits:
-  - name: op4_train
-    num_bytes: 947036
-    num_examples: 246
-  - name: op4_eval
-    num_bytes: 263957
-    num_examples: 62
-  - name: op5_train
-    num_bytes: 952919
-    num_examples: 246
-  - name: op5_eval
-    num_bytes: 265144
-    num_examples: 62
-  download_size: 1262330
+  - name: op4_test
+    num_bytes: 1210993
+    num_examples: 308
+  - name: op5_test
+    num_bytes: 1218063
+    num_examples: 308
+  download_size: 1206626
   dataset_size: 2429056
 configs:
 - config_name: default
   data_files:
-  - split: op4_train
-    path: data/op4_train-*
-  - split: op4_eval
-    path: data/op4_eval-*
-  - split: op5_train
-    path: data/op5_train-*
-  - split: op5_eval
-    path: data/op5_eval-*
+  - split: op4_test
+    path: data/op4_test-*
+  - split: op5_test
+    path: data/op5_test-*
 task_categories:
 - question-answering
 tags:
@@ -67,14 +57,10 @@ HuggingFace upload of a multiple-choice QA dataset of USMLE Step 2 and Step 3 st
 ### Dataset Description
 
 The dataset contains four splits:
-  - **op4_train**: four-option multiple-choice QA (choices A-D)
-  - **op4_eval**: four-option multiple-choice QA (choices A-D)
-  - **op5_train**: five-option multiple-choice QA (choices A-E)
-  - **op5_eval**: five-option multiple-choice QA (choices A-E)
+  - **op4_test**: four-option multiple-choice QA (choices A-D)
+  - **op5_test**: five-option multiple-choice QA (choices A-E)
 
-`op5` splits contain the same content as `op4` splits, but with one additional answer choice to increase difficulty. Note that while the content is the same, the letter choice corresponding to the correct answer is sometimes different between these splits.
-
-The train/eval splits for a given number of options are 80/20, where the last 20% of the original, complete dataset is used for evals.
+`op5_test` contains the same content as `op4_test`, but with one additional answer choice to increase difficulty. Note that while the content is the same, the letter choice corresponding to the correct answer is sometimes different between these splits.
 
 ### Dataset Sources
 
@@ -94,23 +80,13 @@ def _strip_E(split):
         yield ex
 
 if __name__ == "__main__":
-    # load all data
-    # dataset = load_dataset("mkieffer/Medbullets")
+    op4_test, op5_test = load_dataset("mkieffer/Medbullets", split=["op4_test", "op5_test"])
 
-    # load only op4 splits
-    op4_train, op4_eval = load_dataset("mkieffer/Medbullets", split=["op4_train", "op4_eval"])
+    # remove the "E" option from op4 split
+    op4_test = Dataset.from_generator(lambda: _strip_E(op4_test))
 
-    # remove the "E" option from op4 splits
-    op4_train = Dataset.from_generator(lambda: _strip_E(op4_train))
-    op4_eval  = Dataset.from_generator(lambda: _strip_E(op4_eval))
-
-    # load only op5 splits
-    op5_train, op5_eval = load_dataset("mkieffer/Medbullets", split=["op5_train", "op5_eval"])
-
-    print("\nop4_train:\n", json.dumps(op4_train[0], indent=2))
-    print("\nop4_eval:\n", json.dumps(op4_eval[0], indent=2))
-    print("\nop5_train:\n", json.dumps(op5_train[0], indent=2))
-    print("\nop5_eval:\n", json.dumps(op5_eval[0], indent=2))
+    print("\nop4_test:\n", json.dumps(op4_test[0], indent=2))
+    print("\nop5_test:\n", json.dumps(op5_test[0], indent=2))
 ```
 
 

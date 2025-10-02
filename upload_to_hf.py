@@ -16,14 +16,11 @@ parser.add_argument("--hf_username", default=os.environ.get("HF_USERNAME", "mkie
 parser.add_argument("--hf_repo_name", default=os.environ.get("HF_REPO_NAME", "Medbullets"))
 parser.add_argument("--private", default=os.environ.get("PRIVATE", "false"),
                     help="Whether the HF dataset repo should be private (true/false)")
-parser.add_argument("--eval_frac", type=float, default=float(os.environ.get("EVAL_FRAC", 0.20)),
-                    help="Fraction of each split to put in eval (default 0.20)")
 args = parser.parse_args()
 
 HF_USERNAME = args.hf_username
 HF_REPO_NAME = args.hf_repo_name
 PRIVATE = str_to_bool(args.private)
-EVAL_FRAC = float(args.eval_frac)
 HF_REPO_ID = f"{HF_USERNAME}/{HF_REPO_NAME}"
 
 DATA_DIR = "data"
@@ -105,30 +102,6 @@ def format_dataset(filepath: str, idx_map: Dict[str, str]):
     formatted.sort(key=lambda e: (e["idx"], e["link"]))
     return formatted
 
-def split_aligned(op4_examples: List[dict], op5_examples: List[dict], eval_frac: float):
-    """
-    Create aligned train/eval splits by idx (shared across OP4/OP5).
-    """
-    idx4 = {e["idx"] for e in op4_examples}
-    idx5 = {e["idx"] for e in op5_examples}
-    common = sorted(idx4.intersection(idx5))  # ascending by idx
-
-    n = len(common)
-    n_eval = max(0, min(n, round(eval_frac * n)))
-    eval_ids = set(common[-n_eval:]) if n_eval > 0 else set()
-    train_ids = set(common[:-n_eval]) if n_eval > 0 else set(common)
-
-    op4_train = [e for e in op4_examples if e["idx"] in train_ids]
-    op4_eval  = [e for e in op4_examples if e["idx"] in eval_ids]
-    op5_train = [e for e in op5_examples if e["idx"] in train_ids]
-    op5_eval  = [e for e in op5_examples if e["idx"] in eval_ids]
-
-    key = lambda e: (e["idx"], e["link"])
-    op4_train.sort(key=key); op4_eval.sort(key=key)
-    op5_train.sort(key=key); op5_eval.sort(key=key)
-
-    return op4_train, op4_eval, op5_train, op5_eval
-
 if __name__ == "__main__":
     # Build shared idx from union of links
     op4_raw = load_json(os.path.join(DATA_DIR, "medbullets_op4.json"))
@@ -139,11 +112,9 @@ if __name__ == "__main__":
     medbullets_op4 = format_dataset(os.path.join(DATA_DIR, "medbullets_op4.json"), idx_map)
     medbullets_op5 = format_dataset(os.path.join(DATA_DIR, "medbullets_op5.json"), idx_map)
 
-    # Aligned splits (by idx), sorted ascending by idx
-    op4_train, op4_eval, op5_train, op5_eval = split_aligned(medbullets_op4, medbullets_op5, EVAL_FRAC)
-    print(f"Aligned splits:")
-    print(f"  op4 -> train: {len(op4_train)} | eval: {len(op4_eval)}")
-    print(f"  op5 -> train: {len(op5_train)} | eval: {len(op5_eval)}")
+    print(f"Dataset sizes:")
+    print(f"  op4_test: {len(medbullets_op4)}")
+    print(f"  op5_test: {len(medbullets_op5)}")
 
     # Optional local dump
     os.makedirs(OUT_DIR, exist_ok=True)
@@ -154,10 +125,8 @@ if __name__ == "__main__":
     create_repo(HF_REPO_ID, repo_type="dataset", private=PRIVATE, exist_ok=True)
 
     dsd = DatasetDict({
-        "op4_train": Dataset.from_list(op4_train, features=FEATURES),
-        "op4_eval":  Dataset.from_list(op4_eval,  features=FEATURES),
-        "op5_train": Dataset.from_list(op5_train, features=FEATURES),
-        "op5_eval":  Dataset.from_list(op5_eval,  features=FEATURES),
+        "op4_test": Dataset.from_list(medbullets_op4, features=FEATURES),
+        "op5_test": Dataset.from_list(medbullets_op5, features=FEATURES),
     })
 
     dsd.push_to_hub(HF_REPO_ID, private=PRIVATE)
